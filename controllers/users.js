@@ -22,3 +22,15 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
+
+module.exports.updateUser = (req, res) => {
+  // const { id } = req.params;
+  const id = req.user._id;
+
+  User.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+    .then((user) => res.status(200).send({ data: user }))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
