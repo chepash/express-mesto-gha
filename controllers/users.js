@@ -1,12 +1,23 @@
 const User = require('../models/user');
 
+class UserNotFoundError extends Error { }
+
 module.exports.getUser = (req, res) => {
   // const { id } = req.params;
   const id = req.user._id;
 
   return User.findById(id)
-    .then((user) => res.status(200).send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .orFail(() => {
+      throw new UserNotFoundError('Пользователь по указанному _id не найден.');
+    })
+    .then((user) => res.status(200).send(user))
+    .catch((err) => {
+      if (err instanceof UserNotFoundError) {
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else {
+        res.status(500).send({ message: err.message });
+      }
+    });
 };
 
 module.exports.getUsers = (req, res) => User.find({})
@@ -18,7 +29,13 @@ module.exports.createUser = (req, res) => {
 
   return User.create({ name, about, avatar })
     .then((user) => res.status(200).send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else {
+        res.status(500).send({ message: err.message });
+      }
+    });
 };
 
 module.exports.updateUser = (req, res) => {
@@ -28,7 +45,17 @@ module.exports.updateUser = (req, res) => {
   return User.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
+  }).orFail(() => {
+    throw new UserNotFoundError('Пользователь по указанному _id не найден.');
   })
     .then((user) => res.status(200).send({ data: user }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err instanceof UserNotFoundError) {
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      } else if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else {
+        res.status(500).send({ message: err.message });
+      }
+    });
 };
