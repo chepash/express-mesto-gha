@@ -38,8 +38,8 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateUser = (req, res) => {
-  const { id } = req.params;
-  // const id = req.user._id;
+  // const { id } = req.params;
+  const id = req.user._id;
 
   return User.findByIdAndUpdate(id, req.body, {
     new: true,
