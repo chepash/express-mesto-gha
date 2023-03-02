@@ -1,12 +1,12 @@
 const CastError = require('mongoose/lib/error/cast');
 const ValidationError = require('mongoose/lib/error/validation');
 const ObjectId = require('mongoose');
-const ApplicationError = require('../errors/UserNotFoundError');
+const ApplicationError = require('../errors/ApplicationError');
 
 const {
   ERR_STATUS_BAD_REQUEST,
-  ERR_STATUS_NOT_FOUND,
-  ERR_STATUS_INTERNAL_SERVER,
+  // ERR_STATUS_NOT_FOUND,
+  // ERR_STATUS_INTERNAL_SERVER,
   // STATUS_OK,
   // STATUS_OK_CREATED,
 } = require('./constants');
@@ -14,12 +14,15 @@ const {
 module.exports.errorHandler = (err, req, res, next) => {
   if (err instanceof ValidationError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
-  } else if (err instanceof CastError) {
+    return;
+  }
+  if (err instanceof CastError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
-  } else if (err instanceof ApplicationError) {
-    res.status(ERR_STATUS_NOT_FOUND).send({ message: err.message });
-  } else {
-    res.status(ERR_STATUS_INTERNAL_SERVER).send({ message: err.message });
+    return;
+  }
+  if (err instanceof ApplicationError) {
+    res.status(err.status).send({ message: err.message });
+    return;
   }
 
   next();

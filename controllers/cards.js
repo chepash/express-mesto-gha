@@ -4,7 +4,7 @@ const {
 } = require('../utils/constants');
 
 const Card = require('../models/card');
-// const CardNotFoundError = require('../errors/CardNotFoundError');
+const CardNotFoundError = require('../errors/CardNotFoundError');
 
 module.exports.getCards = (req, res, next) => Card.find({})
   .populate(['owner', 'likes'])
@@ -33,6 +33,9 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } },
   { new: true },
 )
+  .orFail(() => {
+    throw new CardNotFoundError();
+  })
   .populate(['owner', 'likes'])
   .then((card) => res.status(STATUS_OK).send({ data: card }))
   .catch(next);
@@ -42,6 +45,9 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   { $pull: { likes: req.user._id } },
   { new: true },
 )
+  .orFail(() => {
+    throw new CardNotFoundError();
+  })
   .populate(['owner', 'likes'])
   .then((card) => res.status(STATUS_OK).send({ data: card }))
   .catch(next);
