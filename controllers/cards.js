@@ -1,21 +1,29 @@
+const {
+  ERR_STATUS_BAD_REQUEST,
+  ERR_STATUS_NOT_FOUND,
+  ERR_STATUS_INTERNAL_SERVER,
+  STATUS_OK,
+  STATUS_OK_CREATED,
+} = require('../utils/constants');
+
 const Card = require('../models/card');
 // const CardNotFoundError = require('../errors/CardNotFoundError');
 
 module.exports.getCards = (req, res) => Card.find({})
   .populate(['owner', 'likes'])
-  .then((cards) => res.status(200).send({ data: cards }))
-  .catch((err) => res.status(500).send({ message: `Internal server error ${err}` }));
+  .then((cards) => res.status(STATUS_OK).send({ data: cards }))
+  .catch((err) => res.status(ERR_STATUS_INTERNAL_SERVER).send({ message: `Internal server error ${err}` }));
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send({ data: card }))
+    .then((card) => res.status(STATUS_OK_CREATED).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Error validating data for card create: ${err}` });
+        res.status(ERR_STATUS_BAD_REQUEST).send({ message: `Error validating data for card create: ${err}` });
       } else {
-        res.status(500).send({ message: `Internal server error ${err}` });
+        res.status(ERR_STATUS_INTERNAL_SERVER).send({ message: `Internal server error ${err}` });
       }
     });
 };
@@ -25,50 +33,48 @@ module.exports.deleteCard = (req, res) => {
 
   return Card.findByIdAndRemove(cardId)
     .populate(['owner', 'likes'])
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((cards) => res.status(STATUS_OK).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Card not found' });
+        res.status(ERR_STATUS_NOT_FOUND).send({ message: 'Card not found' });
       } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Error validating data for card create: ${err}` });
+        res.status(ERR_STATUS_BAD_REQUEST).send({ message: `Error validating data for card create: ${err}` });
       } else {
-        res.status(500).send({ message: `Internal server error ${err}` });
+        res.status(ERR_STATUS_INTERNAL_SERVER).send({ message: `Internal server error ${err}` });
       }
     });
 };
 
 module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
-  // req.params.cardId,
-  '63ff692f33ba5cdbd021331d',
+  req.params.cardId,
   { $addToSet: { likes: req.user._id } },
   { new: true },
 )
   .populate(['owner', 'likes'])
-  .then((card) => res.status(200).send({ data: card }))
+  .then((card) => res.status(STATUS_OK).send({ data: card }))
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Card not found' });
+      res.status(ERR_STATUS_NOT_FOUND).send({ message: 'Card not found' });
     } else if (err.name === 'ValidationError') {
-      res.status(400).send({ message: `Error validating data for card like/dislike: ${err}` });
+      res.status(ERR_STATUS_BAD_REQUEST).send({ message: `Error validating data for card like/dislike: ${err}` });
     } else {
-      res.status(500).send({ message: `Internal server error ${err}` });
+      res.status(ERR_STATUS_INTERNAL_SERVER).send({ message: `Internal server error ${err}` });
     }
   });
 
 module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
-  // req.params.cardId,
-  '63ff692f33ba5cdbd021331d',
+  req.params.cardId,
   { $pull: { likes: req.user._id } },
   { new: true },
 )
   .populate(['owner', 'likes'])
-  .then((card) => res.status(200).send({ data: card }))
+  .then((card) => res.status(STATUS_OK).send({ data: card }))
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Card not found' });
+      res.status(ERR_STATUS_NOT_FOUND).send({ message: 'Card not found' });
     } else if (err.name === 'ValidationError') {
-      res.status(400).send({ message: `Error validating data for card like/dislike: ${err}` });
+      res.status(ERR_STATUS_BAD_REQUEST).send({ message: `Error validating data for card like/dislike: ${err}` });
     } else {
-      res.status(500).send({ message: `Internal server error ${err}` });
+      res.status(ERR_STATUS_INTERNAL_SERVER).send({ message: `Internal server error ${err}` });
     }
   });
