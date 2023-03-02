@@ -1,8 +1,9 @@
 const ApplicationError = require('./ApplicationError');
+const { ERR_STATUS_NOT_FOUND } = require('../utils/constants');
 
 module.exports = class UserNotFoundError extends ApplicationError {
   constructor() {
-    super(404, 'User not found');
+    super(ERR_STATUS_NOT_FOUND, 'User not found');
     this.name = 'UserNotFoundError';
   }
 };
