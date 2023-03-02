@@ -1,16 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const process = require('process');
-// const CastError = require('mongoose/lib/error/cast');
-// const ValidationError = require('mongoose/lib/error/validation');
 const routes = require('./routes');
-const {
-  ERR_STATUS_BAD_REQUEST,
-  // ERR_STATUS_NOT_FOUND,
-  ERR_STATUS_INTERNAL_SERVER,
-  // STATUS_OK,
-  // STATUS_OK_CREATED,
-} = require('./utils/constants');
 
 const { errorHandler } = require('./utils/utils');
 
@@ -26,17 +17,11 @@ const app = express();
 
 app.use(express.json());
 
-/// //////////////////////////////////////////////////////////////////////////////
-// app.use((req, res, next) => {
-//   console.log('request : ', req);
-//   next();
-// });
-
 app.use((req, res, next) => {
   req.user = { _id: '63ff56fbe65a55e9b3e58e0a' };
   next();
 });
-app.get('/', (req, res) => {
+app.get('/', (req, res, next) => {
   res.send(
     ` <html>
         <body>
@@ -44,9 +29,11 @@ app.get('/', (req, res) => {
         </body>
       </html>`,
   );
+  next();
 });
 app.use(routes);
 app.use(errorHandler);
+app.use('*', (req, res) => { res.status(404).send({ message: 'URL not found' }); });
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
