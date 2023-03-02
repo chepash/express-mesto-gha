@@ -1,23 +1,22 @@
 const Card = require('../models/card');
-
-class CardNotFoundError extends Error { }
+const CardNotFoundError = require('../errors/CardNotFoundError');
 
 module.exports.getCards = (req, res) => Card.find({})
   .populate(['owner', 'likes'])
   .then((cards) => res.status(200).send({ data: cards }))
-  .catch((err) => res.status(500).send({ message: err.message }));
+  .catch((err) => res.status(500).send({ message: `Internal server error ${err}` }));
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req.user._id })
     .populate(['owner', 'likes'])
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
       } else {
-        res.status(500).send({ message: err.message });
+        res.status(500).send({ message: `Internal server error ${err}` });
       }
     });
 };
@@ -34,7 +33,7 @@ module.exports.deleteCard = (req, res) => {
       } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
       } else {
-        res.status(500).send({ message: err.message });
+        res.status(500).send({ message: `Internal server error ${err}` });
       }
     });
 };
@@ -52,7 +51,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
     } else if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
     } else {
-      res.status(500).send({ message: err.message });
+      res.status(500).send({ message: `Internal server error ${err}` });
     }
   });
 
@@ -62,7 +61,7 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   { new: true },
 )
   .orFail(() => {
-    throw new CardNotFoundError('Карточка с указанным _id не найдена.');
+    throw new CardNotFoundError();
   })
   .populate(['owner', 'likes'])
   .then((card) => res.status(200).send({ data: card }))
@@ -72,6 +71,6 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
     } else if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
     } else {
-      res.status(500).send({ message: err.message });
+      res.status(500).send({ message: `Internal server error ${err}` });
     }
   });

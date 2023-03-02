@@ -19,7 +19,15 @@ app.use((req, res, next) => {
   req.user = { _id: '63ff56fbe65a55e9b3e58e0a' };
   next();
 });
-
+app.get('/', (req, res) => {
+  res.send(
+    ` <html>
+        <body>
+            <p>Сервер запущен</p>
+        </body>
+      </html>`,
+  );
+});
 app.use(routes);
 
 app.listen(PORT, () => {
