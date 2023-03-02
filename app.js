@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const process = require('process');
-const CastError = require('mongoose/lib/error/cast');
-const ValidationError = require('mongoose/lib/error/validation');
+// const CastError = require('mongoose/lib/error/cast');
+// const ValidationError = require('mongoose/lib/error/validation');
 const routes = require('./routes');
 const {
   ERR_STATUS_BAD_REQUEST,
@@ -12,7 +12,7 @@ const {
   // STATUS_OK_CREATED,
 } = require('./utils/constants');
 
-const errorHandler = require('./utils/utils');
+const { errorHandler } = require('./utils/utils');
 
 const { PORT = 3000 } = process.env;
 
@@ -46,16 +46,7 @@ app.get('/', (req, res) => {
   );
 });
 app.use(routes);
-app.use((err, req, res, next) => {
-  console.log(true);
-  if (err instanceof ValidationError) {
-    res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
-  } else if (err instanceof CastError) {
-    res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
-  } else {
-    res.status(ERR_STATUS_INTERNAL_SERVER).send({ message: err.message });
-  }
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
