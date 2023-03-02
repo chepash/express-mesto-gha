@@ -23,6 +23,9 @@ module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   return Card.findByIdAndRemove(cardId)
+    .orFail(() => {
+      throw new CardNotFoundError();
+    })
     .populate(['owner', 'likes'])
     .then((cards) => res.status(STATUS_OK).send({ data: cards }))
     .catch(next);
