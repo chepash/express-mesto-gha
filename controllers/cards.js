@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const CardNotFoundError = require('../errors/CardNotFoundError');
+// const CardNotFoundError = require('../errors/CardNotFoundError');
 
 module.exports.getCards = (req, res) => Card.find({})
   .populate(['owner', 'likes'])
@@ -10,7 +10,6 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req.user._id })
-    .populate(['owner', 'likes'])
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -29,7 +28,7 @@ module.exports.deleteCard = (req, res) => {
     .then((cards) => res.status(200).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(err.status).send({ message: err.message });
+        res.status(404).send({ message: 'Card not found' });
       } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Error validating data for card create: ${err}` });
       } else {
@@ -39,18 +38,16 @@ module.exports.deleteCard = (req, res) => {
 };
 
 module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
-  req.params.cardId,
+  // req.params.cardId,
+  '63ff692f33ba5cdbd021331d',
   { $addToSet: { likes: req.user._id } },
   { new: true },
 )
-  .orFail(() => {
-    throw new CardNotFoundError();
-  })
   .populate(['owner', 'likes'])
   .then((card) => res.status(200).send({ data: card }))
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(err.status).send({ message: err.message });
+      res.status(404).send({ message: 'Card not found' });
     } else if (err.name === 'ValidationError') {
       res.status(400).send({ message: `Error validating data for card like/dislike: ${err}` });
     } else {
@@ -59,18 +56,16 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   });
 
 module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
-  req.params.cardId,
+  // req.params.cardId,
+  '63ff692f33ba5cdbd021331d',
   { $pull: { likes: req.user._id } },
   { new: true },
 )
-  .orFail(() => {
-    throw new CardNotFoundError();
-  })
   .populate(['owner', 'likes'])
   .then((card) => res.status(200).send({ data: card }))
   .catch((err) => {
-    if (err instanceof CardNotFoundError) {
-      res.status(err.status).send({ message: err.message });
+    if (err.name === 'CastError') {
+      res.status(404).send({ message: 'Card not found' });
     } else if (err.name === 'ValidationError') {
       res.status(400).send({ message: `Error validating data for card like/dislike: ${err}` });
     } else {
