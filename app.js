@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 app.use((req, res, next) => {
-  req.user = { _id: '63ff56fbe65a55e9b3e58e0a' };
+  req.user = { _id: '63ff56fbe65a55e9b3e58e0a_' };
   next();
 });
 app.get('/', (req, res) => {

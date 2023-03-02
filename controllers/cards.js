@@ -14,7 +14,7 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        res.status(400).send({ message: `Error validating data for card create: ${err}` });
       } else {
         res.status(500).send({ message: `Internal server error ${err}` });
       }
@@ -29,9 +29,9 @@ module.exports.deleteCard = (req, res) => {
     .then((cards) => res.status(200).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+        res.status(err.status).send({ message: err.message });
       } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        res.status(400).send({ message: `Error validating data for card create: ${err}` });
       } else {
         res.status(500).send({ message: `Internal server error ${err}` });
       }
@@ -43,13 +43,16 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } },
   { new: true },
 )
+  .orFail(() => {
+    throw new CardNotFoundError();
+  })
   .populate(['owner', 'likes'])
   .then((card) => res.status(200).send({ data: card }))
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      res.status(err.status).send({ message: err.message });
     } else if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+      res.status(400).send({ message: `Error validating data for card like/dislike: ${err}` });
     } else {
       res.status(500).send({ message: `Internal server error ${err}` });
     }
@@ -67,9 +70,9 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   .then((card) => res.status(200).send({ data: card }))
   .catch((err) => {
     if (err instanceof CardNotFoundError) {
-      res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      res.status(err.status).send({ message: err.message });
     } else if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+      res.status(400).send({ message: `Error validating data for card like/dislike: ${err}` });
     } else {
       res.status(500).send({ message: `Internal server error ${err}` });
     }
