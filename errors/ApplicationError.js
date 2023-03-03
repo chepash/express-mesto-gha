@@ -1,7 +1,7 @@
 const { ERR_STATUS_INTERNAL_SERVER } = require('../utils/constants');
 
 module.exports = class ApplicationError extends Error {
-  constructor(status = ERR_STATUS_INTERNAL_SERVER, message = 'Internal Error') {
+  constructor(status = ERR_STATUS_INTERNAL_SERVER, message = 'На сервере произошла ошибка') {
     super();
     this.status = status;
     this.message = message;
