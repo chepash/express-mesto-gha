@@ -1,6 +1,7 @@
 const CastError = require('mongoose/lib/error/cast');
 const ValidationError = require('mongoose/lib/error/validation');
 const ObjectId = require('mongoose');
+const validator = require('validator');
 
 const ApplicationError = require('../errors/ApplicationError');
 
@@ -35,6 +36,24 @@ module.exports.validateUserId = (req, res, next) => {
 module.exports.validateCardId = (req, res, next) => {
   if (!ObjectId.isValidObjectId(req.params.cardId)) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: 'Invalid card id' });
+    return;
+  }
+
+  next();
+};
+
+module.exports.validateAvatarUrl = (req, res, next) => {
+  if (!validator.isURL(req.body.avatar)) {
+    res.status(ERR_STATUS_BAD_REQUEST).send({ message: 'Invalid avatar url' });
+    return;
+  }
+
+  next();
+};
+
+module.exports.validateCardUrl = (req, res, next) => {
+  if (!validator.isURL(req.body.link)) {
+    res.status(ERR_STATUS_BAD_REQUEST).send({ message: 'Invalid card url' });
     return;
   }
 
