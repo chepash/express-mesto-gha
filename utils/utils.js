@@ -1,6 +1,4 @@
-const CastError = require('mongoose/lib/error/cast');
-const ValidationError = require('mongoose/lib/error/validation');
-const ObjectId = require('mongoose');
+const mongoose = require('mongoose');
 const validator = require('validator');
 
 const ApplicationError = require('../errors/ApplicationError');
@@ -8,11 +6,11 @@ const ApplicationError = require('../errors/ApplicationError');
 const { ERR_STATUS_BAD_REQUEST } = require('./constants');
 
 module.exports.errorHandler = (err, req, res, next) => {
-  if (err instanceof ValidationError) {
+  if (err instanceof mongoose.Error.ValidationError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
     return;
   }
-  if (err instanceof CastError) {
+  if (err instanceof mongoose.Error.CastError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
     return;
   }
@@ -21,11 +19,13 @@ module.exports.errorHandler = (err, req, res, next) => {
     return;
   }
 
+  console.log(err);
+
   next();
 };
 
 module.exports.validateUserId = (req, res, next) => {
-  if (!ObjectId.isValidObjectId(req.params.id)) {
+  if (!mongoose.isValidObjectId(req.params.id)) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: 'Invalid user id' });
     return;
   }
@@ -34,7 +34,7 @@ module.exports.validateUserId = (req, res, next) => {
 };
 
 module.exports.validateCardId = (req, res, next) => {
-  if (!ObjectId.isValidObjectId(req.params.cardId)) {
+  if (!mongoose.isValidObjectId(req.params.cardId)) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: 'Invalid card id' });
     return;
   }

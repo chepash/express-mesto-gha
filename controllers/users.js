@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const UserNotFoundError = require('../errors/UserNotFoundError');
 const {
@@ -22,11 +23,18 @@ module.exports.getUsers = (req, res, next) => User.find({})
   .catch(next);
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-
-  return User.create({ name, about, avatar })
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+  return bcrypt.hash(password, 10).then((hash) => User.create({
+    name, about, avatar, email, password: hash,
+  })
     .then((user) => res.status(STATUS_OK_CREATED).send({ data: user }))
-    .catch(next);
+    .catch(next));
 };
 
 module.exports.updateUser = (req, res, next) => {
