@@ -4,6 +4,8 @@ const routes = require('./routes');
 const { PORT, DB_ADDRESS } = require('./config');
 
 const { errorHandler } = require('./utils/utils');
+const { createUser } = require('./controllers/users');
+const { login } = require('./controllers/login');
 const { ERR_STATUS_NOT_FOUND } = require('./utils/constants');
 
 mongoose.connect(DB_ADDRESS, {
@@ -30,6 +32,10 @@ app.get('/', (req, res, next) => {
   );
   next();
 });
+
+app.post('/signin', login);
+app.post('/signup', createUser);
+
 app.use(routes);
 app.use(errorHandler);
 app.use('*', (req, res) => { res.status(ERR_STATUS_NOT_FOUND).send({ message: 'URL not found' }); });

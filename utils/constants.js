@@ -1,4 +1,5 @@
 module.exports.ERR_STATUS_BAD_REQUEST = 400;
+module.exports.ERR_STATUS_UNAUTHORIZED = 401;
 module.exports.ERR_STATUS_NOT_FOUND = 404;
 module.exports.ERR_STATUS_INTERNAL_SERVER = 500;
 

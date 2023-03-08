@@ -6,6 +6,7 @@ const ApplicationError = require('../errors/ApplicationError');
 const { ERR_STATUS_BAD_REQUEST } = require('./constants');
 
 module.exports.errorHandler = (err, req, res, next) => {
+  console.log(err);
   if (err instanceof mongoose.Error.ValidationError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
     return;
@@ -18,8 +19,6 @@ module.exports.errorHandler = (err, req, res, next) => {
     res.status(err.status).send({ message: err.message });
     return;
   }
-
-  console.log(err);
 
   next();
 };
