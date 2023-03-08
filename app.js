@@ -1,17 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const process = require('process');
 const routes = require('./routes');
+const { PORT, DB_ADDRESS } = require('./config');
 
 const { errorHandler } = require('./utils/utils');
-const {
-  DEFAULT_PORT,
-  ERR_STATUS_NOT_FOUND,
-} = require('./utils/constants');
+const { ERR_STATUS_NOT_FOUND } = require('./utils/constants');
 
-const { PORT = DEFAULT_PORT } = process.env;
-
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
   // useCreateIndex: true,
   // useFindAndModify: false,
