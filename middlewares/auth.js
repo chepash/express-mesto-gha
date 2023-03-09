@@ -1,13 +1,13 @@
 const jsonwebtoken = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
-const { ERR_STATUS_UNAUTHORIZED } = require('../utils/constants');
+const AuthorizationError = require('../errors/AuthorizationError');
 
 // POST /signin
 module.exports.auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer')) {
-    res.status(ERR_STATUS_UNAUTHORIZED).send({ message: 'Please authorise' });
+    throw new AuthorizationError();
   }
 
   let payload;
@@ -15,7 +15,7 @@ module.exports.auth = (req, res, next) => {
   try {
     payload = jsonwebtoken.verify(jwt, JWT_SECRET);
   } catch (err) {
-    res.status(ERR_STATUS_UNAUTHORIZED).send({ message: 'Please authorise' });
+    throw new AuthorizationError();
   }
 
   req.user = payload;

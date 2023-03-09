@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const UserNotFoundError = require('../errors/UserNotFoundError');
+const NotFoundError = require('../errors/NotFoundError');
 const {
   STATUS_OK,
   STATUS_OK_CREATED,
@@ -16,7 +16,7 @@ module.exports.getUser = (req, res, next) => {
       // в версии mongoose 7.0.0+ логика orFail поменялась,
       // теперь метод только 404 возвращает при неудавшемся поиске
       // поэтому валидацию данных перед поиском провожу
-      throw new UserNotFoundError();
+      throw new NotFoundError();
     })
     .then((user) => res.status(STATUS_OK).send(user))
     .catch(next);
@@ -49,7 +49,7 @@ module.exports.getMe = (req, res, next) => {
 
   return User.findById(id)
     .orFail(() => {
-      throw new UserNotFoundError();
+      throw new NotFoundError();
     })
     .then((user) => res.status(STATUS_OK).send(user))
     .catch(next);
@@ -65,7 +65,7 @@ module.exports.updateUser = (req, res, next) => {
     new: true,
     runValidators: true,
   }).orFail(() => {
-    throw new UserNotFoundError();
+    throw new NotFoundError();
   })
     .then((user) => res.status(STATUS_OK).send({ data: user }))
     .catch(next);

@@ -4,7 +4,7 @@ const {
 } = require('../utils/constants');
 
 const Card = require('../models/card');
-const CardNotFoundError = require('../errors/CardNotFoundError');
+const NotFoundError = require('../errors/NotFoundError');
 const WrongCardOwnerError = require('../errors/WrongCardOwnerError');
 
 // GET /cards
@@ -28,7 +28,7 @@ module.exports.deleteCard = (req, res, next) => {
 
   return Card.findById(cardId)
     .orFail(() => {
-      throw new CardNotFoundError();
+      throw new NotFoundError();
     })
     .then((card) => {
       if (card.owner.toString() === req.user._id) {
@@ -48,7 +48,7 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   { new: true },
 )
   .orFail(() => {
-    throw new CardNotFoundError();
+    throw new NotFoundError();
   })
   .populate(['owner', 'likes'])
   .then((card) => res.status(STATUS_OK).send({ data: card }))
@@ -61,7 +61,7 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   { new: true },
 )
   .orFail(() => {
-    throw new CardNotFoundError();
+    throw new NotFoundError();
   })
   .populate(['owner', 'likes'])
   .then((card) => res.status(STATUS_OK).send({ data: card }))
