@@ -5,6 +5,7 @@ const {
 
 const Card = require('../models/card');
 const CardNotFoundError = require('../errors/CardNotFoundError');
+const WrongCardOwnerError = require('../errors/WrongCardOwnerError');
 
 // GET /cards
 module.exports.getCards = (req, res, next) => Card.find({})
@@ -25,11 +26,17 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
-  return Card.findByIdAndRemove(cardId)
+  return Card.findById(cardId)
     .orFail(() => {
       throw new CardNotFoundError();
     })
-    .populate(['owner', 'likes'])
+    .then((card) => {
+      if (card.owner.toString() === req.user._id) {
+        return card.deleteOne();
+      }
+      throw new WrongCardOwnerError();
+    })
+    // .populate(['owner', 'likes'])
     .then((cards) => res.status(STATUS_OK).send({ data: cards }))
     .catch(next);
 };

@@ -3,7 +3,7 @@ const validator = require('validator');
 
 const ApplicationError = require('../errors/ApplicationError');
 
-const { ERR_STATUS_BAD_REQUEST } = require('./constants');
+const { ERR_STATUS_BAD_REQUEST, ERR_STATUS_CONFLICT } = require('./constants');
 
 module.exports.errorHandler = (err, req, res, next) => {
   console.log(err);
@@ -15,6 +15,12 @@ module.exports.errorHandler = (err, req, res, next) => {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
     return;
   }
+
+  if (err.code === 11000) {
+    res.status(ERR_STATUS_CONFLICT).send({ message: 'User with this email already exist' });
+    return;
+  }
+
   if (err instanceof ApplicationError) {
     res.status(err.status).send({ message: err.message });
     return;

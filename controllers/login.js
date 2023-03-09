@@ -10,7 +10,7 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   User
-    .findOne({ email })
+    .findOne({ email }).select('+password')
     .orFail(() => {
       throw new AuthorizationError();
     })

@@ -7,6 +7,7 @@ const { errorHandler } = require('./utils/utils');
 const { createUser } = require('./controllers/users');
 const { login } = require('./controllers/login');
 const { ERR_STATUS_NOT_FOUND } = require('./utils/constants');
+const { auth } = require('./middlewares/auth');
 
 mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
@@ -18,10 +19,6 @@ const app = express();
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  req.user = { _id: '63ff56fbe65a55e9b3e58e0a' };
-  next();
-});
 app.get('/', (req, res, next) => {
   res.send(
     ` <html>
@@ -36,7 +33,7 @@ app.get('/', (req, res, next) => {
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use(routes);
+app.use(auth, routes);
 app.use(errorHandler);
 app.use('*', (req, res) => { res.status(ERR_STATUS_NOT_FOUND).send({ message: 'URL not found' }); });
 
