@@ -6,11 +6,13 @@ const {
 const Card = require('../models/card');
 const CardNotFoundError = require('../errors/CardNotFoundError');
 
+// GET /cards
 module.exports.getCards = (req, res, next) => Card.find({})
   .populate(['owner', 'likes'])
   .then((cards) => res.status(STATUS_OK).send({ data: cards }))
   .catch(next);
 
+// POST /cards
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
@@ -19,6 +21,7 @@ module.exports.createCard = (req, res, next) => {
     .catch(next);
 };
 
+// DELETE /cards/:cardId
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
@@ -31,6 +34,7 @@ module.exports.deleteCard = (req, res, next) => {
     .catch(next);
 };
 
+// PUT /cards/:cardId/likes
 module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $addToSet: { likes: req.user._id } },
@@ -43,6 +47,7 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   .then((card) => res.status(STATUS_OK).send({ data: card }))
   .catch(next);
 
+// DELETE /cards/:cardId/likes
 module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $pull: { likes: req.user._id } },

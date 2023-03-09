@@ -5,6 +5,7 @@ const User = require('../models/user');
 const AuthorizationError = require('../errors/AuthorizationError');
 const { JWT_SECRET } = require('../config');
 
+// POST /signin
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 

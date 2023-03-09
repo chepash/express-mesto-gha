@@ -6,22 +6,28 @@ const {
   STATUS_OK_CREATED,
 } = require('../utils/constants');
 
+// GET /users/:id
 module.exports.getUser = (req, res, next) => {
   const { id } = req.params;
   // const id = req.user._id;
 
   return User.findById(id)
     .orFail(() => {
+      // в версии mongoose 7.0.0+ логика orFail поменялась,
+      // теперь метод только 404 возвращает при неудавшемся поиске
+      // поэтому валидацию данных перед поиском провожу
       throw new UserNotFoundError();
     })
     .then((user) => res.status(STATUS_OK).send(user))
     .catch(next);
 };
 
+// GET /users
 module.exports.getUsers = (req, res, next) => User.find({})
   .then((users) => res.status(STATUS_OK).send({ data: users }))
   .catch(next);
 
+// POST /signup
 module.exports.createUser = (req, res, next) => {
   const {
     name,
@@ -37,6 +43,20 @@ module.exports.createUser = (req, res, next) => {
     .catch(next));
 };
 
+// GET /users/me
+module.exports.getMe = (req, res, next) => {
+  const id = req.user._id;
+
+  return User.findById(id)
+    .orFail(() => {
+      throw new UserNotFoundError();
+    })
+    .then((user) => res.status(STATUS_OK).send(user))
+    .catch(next);
+};
+
+// PATCH /users/me
+// PATCH /users/me/avatar
 module.exports.updateUser = (req, res, next) => {
   // const { id } = req.params;
   const id = req.user._id;
