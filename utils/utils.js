@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const { celebrate, Joi } = require('celebrate');
 
 const ApplicationError = require('../errors/ApplicationError');
@@ -32,21 +31,6 @@ module.exports.errorHandler = (err, req, res, next) => {
   next();
 };
 
-module.exports.validateUserId = celebrate({
-  params: Joi.object({
-    id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
-  }),
-});
-
-module.exports.validateCardId = (req, res, next) => {
-  if (!mongoose.isValidObjectId(req.params.cardId)) {
-    res.status(ERR_STATUS_BAD_REQUEST).send({ message: 'Invalid card id' });
-    return;
-  }
-
-  next();
-};
-
 module.exports.validateDataWithJoi = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
@@ -62,30 +46,26 @@ module.exports.validateDataWithJoi = celebrate({
   }),
 });
 
-// module.exports.validateCardIdWithJoi = celebrate({
-//   params: Joi.object().keys({
-//     cardId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
-//   }),
-// });
-
-module.exports.validateRequiredCardDataWithJoi = celebrate({
+module.exports.validateRequiredCardData = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     link: Joi.string().required().uri().regex(/^https?:\/\/.+/i),
   }),
 });
 
-// module.exports.validateAvatarUrl = celebrate({
-//   body: Joi.object({
-//     avatar: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
-//   }),
-// });
+module.exports.validateSignInData = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+});
 
-module.exports.validateCardUrl = (req, res, next) => {
-  if (!validator.isURL(req.body.link)) {
-    res.status(ERR_STATUS_BAD_REQUEST).send({ message: 'Invalid card url' });
-    return;
-  }
-
-  next();
-};
+module.exports.validateSignUpData = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().uri().regex(/^https?:\/\/.+/i),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+});

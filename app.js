@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { celebrate, Joi, errors } = require('celebrate');
+const celebrate = require('celebrate');
 
 const routes = require('./routes');
 const { PORT, DB_ADDRESS } = require('./config');
@@ -10,6 +10,7 @@ const { createUser } = require('./controllers/users');
 const { login } = require('./controllers/login');
 const { ERR_STATUS_NOT_FOUND } = require('./utils/constants');
 const { auth } = require('./middlewares/auth');
+const { validateSignInData, validateSignUpData } = require('./utils/utils');
 
 mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
@@ -32,25 +33,11 @@ app.get('/', (req, res, next) => {
   next();
 });
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
-
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri().regex(/^https?:\/\/.+/i),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createUser);
+app.post('/signin', validateSignInData, login);
+app.post('/signup', validateSignUpData, createUser);
 
 app.use(auth, routes);
-app.use(errors());
+app.use(celebrate.errors());
 app.use(errorHandler);
 
 app.use('*', (req, res) => { res.status(ERR_STATUS_NOT_FOUND).send({ message: 'URL not found' }); });
