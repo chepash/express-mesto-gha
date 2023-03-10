@@ -7,12 +7,12 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 
-const { validateCardId, validateCardUrl } = require('../utils/utils');
+const { validateDataWithJoi } = require('../utils/utils');
 
 router.get('/', getCards);
-router.post('/', validateCardUrl, createCard);
-router.delete('/:cardId', validateCardId, deleteCard);
-router.put('/:cardId/likes', validateCardId, likeCard);
-router.delete('/:cardId/likes', validateCardId, dislikeCard);
+router.post('/', validateDataWithJoi, createCard);
+router.delete('/:cardId', validateDataWithJoi, deleteCard);
+router.put('/:cardId/likes', validateDataWithJoi, likeCard);
+router.delete('/:cardId/likes', validateDataWithJoi, dislikeCard);
 
 module.exports = router;
