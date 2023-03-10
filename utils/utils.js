@@ -7,9 +7,9 @@ const ApplicationError = require('../errors/ApplicationError');
 const { ERR_STATUS_BAD_REQUEST, ERR_STATUS_CONFLICT } = require('./constants');
 
 module.exports.errorHandler = (err, req, res, next) => {
-  console.log('err.constructor - ', err.constructor);
-  console.log('err.constructor.name - ', err.constructor.name);
-  console.log('err itself - ', err);
+  // console.log('err.constructor - ', err.constructor);
+  // console.log('err.constructor.name - ', err.constructor.name);
+  // console.log('err itself - ', err);
   if (err instanceof mongoose.Error.ValidationError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
     return;
@@ -58,6 +58,20 @@ module.exports.validateDataWithJoi = celebrate({
   }),
   params: Joi.object().keys({
     id: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    cardId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+  }),
+});
+
+// module.exports.validateCardIdWithJoi = celebrate({
+//   params: Joi.object().keys({
+//     cardId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+//   }),
+// });
+
+module.exports.validateRequiredCardDataWithJoi = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().uri().regex(/^https?:\/\/.+/i),
   }),
 });
 
