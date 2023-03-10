@@ -1,11 +1,14 @@
+const helmet = require('helmet');
+const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
+
 const celebrate = require('celebrate');
 
 const routes = require('./routes');
 const { PORT, DB_ADDRESS } = require('./config');
 
-const { errorHandler } = require('./utils/utils');
+const { appErrorHandler } = require('./utils/utils');
 const { createUser } = require('./controllers/users');
 const { login } = require('./controllers/login');
 const { ERR_STATUS_NOT_FOUND } = require('./utils/constants');
@@ -20,6 +23,8 @@ mongoose.connect(DB_ADDRESS, {
 
 const app = express();
 
+app.use(helmet());
+app.use(cors({ origin: ['http://localhost:3000'] }));
 app.use(express.json());
 
 app.get('/', (req, res, next) => {
@@ -38,7 +43,7 @@ app.post('/signup', validateSignUpData, createUser);
 
 app.use(auth, routes);
 app.use(celebrate.errors());
-app.use(errorHandler);
+app.use(appErrorHandler);
 
 app.use('*', (req, res) => { res.status(ERR_STATUS_NOT_FOUND).send({ message: 'URL not found' }); });
 

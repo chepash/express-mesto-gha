@@ -5,7 +5,7 @@ const ApplicationError = require('../errors/ApplicationError');
 
 const { ERR_STATUS_BAD_REQUEST, ERR_STATUS_CONFLICT } = require('./constants');
 
-module.exports.errorHandler = (err, req, res, next) => {
+module.exports.appErrorHandler = (err, req, res, next) => {
   if (err instanceof mongoose.Error.ValidationError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
     return;
