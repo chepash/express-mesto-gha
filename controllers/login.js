@@ -27,6 +27,7 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000 * 24 * 7, // expiresIn: '7d'
           httpOnly: true,
         })
+        .send({ token: jwt })
         .end();
     })
     .catch(next);

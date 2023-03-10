@@ -1,4 +1,3 @@
-const { celebrate } = require('celebrate');
 const mongoose = require('mongoose');
 const validator = require('validator');
 
@@ -7,9 +6,9 @@ const ApplicationError = require('../errors/ApplicationError');
 const { ERR_STATUS_BAD_REQUEST, ERR_STATUS_CONFLICT } = require('./constants');
 
 module.exports.errorHandler = (err, req, res, next) => {
-  console.log('err.constructor - ', err.constructor);
-  console.log('err.constructor.name - ', err.constructor.name);
-  console.log('err itself - ', err);
+  // console.log('err.constructor - ', err.constructor);
+  // console.log('err.constructor.name - ', err.constructor.name);
+  // console.log('err itself - ', err);
   if (err instanceof mongoose.Error.ValidationError) {
     res.status(ERR_STATUS_BAD_REQUEST).send({ message: err.message });
     return;
@@ -26,11 +25,6 @@ module.exports.errorHandler = (err, req, res, next) => {
 
   if (err instanceof ApplicationError) {
     res.status(err.status).send({ message: err.message });
-    return;
-  }
-
-  if (err.joi) {
-    res.status(err.status).send({ message: 'и будет тебе счастье' });
     return;
   }
 

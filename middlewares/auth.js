@@ -19,6 +19,6 @@ module.exports.auth = (req, res, next) => {
   }
 
   req.user = payload;
-  console.log('AUTH req.user : ', req.user);
+  // console.log('AUTH req.user : ', req.user);
   next();
 };
