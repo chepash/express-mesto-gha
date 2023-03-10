@@ -32,7 +32,7 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .populate(['owner', 'likes'])
     .then((card) => {
-      if (card.owner._id === req.user._id) {
+      if (card.owner._id.toString() === req.user._id) {
         return card.deleteOne();
       }
       throw new WrongCardOwnerError();
