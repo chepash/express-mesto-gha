@@ -14,10 +14,11 @@ module.exports.auth = (req, res, next) => {
   const jwt = authorization.replace('Bearer ', '');
   try {
     payload = jsonwebtoken.verify(jwt, JWT_SECRET);
-  } catch (err) {
+  } catch {
     throw new AuthorizationError();
   }
 
   req.user = payload;
+  console.log('AUTH req.user : ', req.user);
   next();
 };

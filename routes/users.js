@@ -12,7 +12,7 @@ router.get('/', getUsers);
 
 router.get('/me', getMe);
 router.patch('/me', updateUser);
-router.get('/:id', validateUserId, getUser);
 router.patch('/me/avatar', validateAvatarUrl, updateUser);
+router.get('/:id', validateUserId, getUser);
 
 module.exports = router;

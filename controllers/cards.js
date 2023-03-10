@@ -30,13 +30,13 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError();
     })
+    .populate(['owner', 'likes'])
     .then((card) => {
-      if (card.owner.toString() === req.user._id) {
+      if (card.owner._id.toString() === req.user._id) {
         return card.deleteOne();
       }
       throw new WrongCardOwnerError();
     })
-    // .populate(['owner', 'likes'])
     .then((cards) => res.status(STATUS_OK).send({ data: cards }))
     .catch(next);
 };
