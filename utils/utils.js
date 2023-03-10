@@ -1,3 +1,4 @@
+const { celebrate } = require('celebrate');
 const mongoose = require('mongoose');
 const validator = require('validator');
 
@@ -25,6 +26,11 @@ module.exports.errorHandler = (err, req, res, next) => {
 
   if (err instanceof ApplicationError) {
     res.status(err.status).send({ message: err.message });
+    return;
+  }
+
+  if (err.joi) {
+    res.status(err.status).send({ message: 'и будет тебе счастье' });
     return;
   }
 

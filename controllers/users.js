@@ -29,17 +29,20 @@ module.exports.getUsers = (req, res, next) => User.find({})
 
 // POST /signup
 module.exports.createUser = (req, res, next) => {
-  const {
-    name,
-    about,
-    avatar,
-    email,
-    password,
-  } = req.body;
+  const { password } = req.body;
   return bcrypt.hash(password, 10).then((hash) => User.create({
-    name, about, avatar, email, password: hash,
+    ...req.body, password: hash,
   })
-    .then((user) => res.status(STATUS_OK_CREATED).send({ data: user }))
+    .then((user) => res.status(STATUS_OK_CREATED).send({
+      data:
+      { // высылаем в ответ всё кроме хэша пароля
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      },
+    }))
     .catch(next));
 };
 
