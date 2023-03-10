@@ -61,7 +61,6 @@ module.exports.getMe = (req, res, next) => {
 // PATCH /users/me
 // PATCH /users/me/avatar
 module.exports.updateUser = (req, res, next) => {
-  // const { id } = req.params;
   const id = req.user._id;
 
   return User.findByIdAndUpdate(id, req.body, {
