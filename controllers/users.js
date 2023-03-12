@@ -59,11 +59,27 @@ module.exports.getMe = (req, res, next) => {
 };
 
 // PATCH /users/me
-// PATCH /users/me/avatar
-module.exports.updateUser = (req, res, next) => {
+module.exports.updateUserInfo = (req, res, next) => {
   const id = req.user._id;
 
-  return User.findByIdAndUpdate(id, req.body, {
+  return User.findByIdAndUpdate(id, {
+    name: req.body.name,
+    about: req.body.about,
+  }, {
+    new: true,
+    runValidators: true,
+  }).orFail(() => {
+    throw new NotFoundError();
+  })
+    .then((user) => res.status(STATUS_OK).send({ data: user }))
+    .catch(next);
+};
+
+// PATCH /users/me/avatar
+module.exports.updateUserAvatar = (req, res, next) => {
+  const id = req.user._id;
+
+  return User.findByIdAndUpdate(id, { avatar: req.body.avatar }, {
     new: true,
     runValidators: true,
   }).orFail(() => {
