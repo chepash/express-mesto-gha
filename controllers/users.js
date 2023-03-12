@@ -15,7 +15,7 @@ module.exports.getUser = (req, res, next) => {
     .orFail(() => {
       // в версии mongoose 7.0.0+ логика orFail поменялась,
       // теперь метод только 404 возвращает при неудавшемся поиске
-      // поэтому валидацию данных перед поиском провожу
+      // поэтому валидацию данных перед запросом в базу провожу
       throw new NotFoundError();
     })
     .then((user) => res.status(STATUS_OK).send(user))

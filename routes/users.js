@@ -7,7 +7,7 @@ const {
   getMe,
 } = require('../controllers/users');
 
-const { validateDataWithJoi } = require('../utils/utils');
+const { validateDataWithJoi } = require('../utils/validation');
 
 router.get('/', getUsers);
 
