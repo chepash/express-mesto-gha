@@ -12,7 +12,7 @@ const cardSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        const regex = /^https?:\/\/.+/i;
+        const regex = /^https?:\/\/((www\.)|(?!www\.)).+\./i;
         return regex.test(v);
       },
       message: 'Picture url is not valid',
