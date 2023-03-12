@@ -5,8 +5,6 @@ const User = require('../models/user');
 const AuthorizationError = require('../errors/AuthorizationError');
 const { JWT_SECRET } = require('../config');
 
-const { STATUS_OK } = require('../utils/constants');
-
 // POST /signin
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -24,7 +22,11 @@ module.exports.login = (req, res, next) => {
     }))
     .then((user) => {
       const jwt = jsonwebtoken.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-      res.status(STATUS_OK).send({ token: jwt });
+
+      res.cookie('jwt', jwt, {
+        maxAge: 3600000 * 24 * 7, // expiresIn: '7d'
+        httpOnly: true,
+      }).send({ message: 'Successful authorization' }).end();
     })
     .catch(next);
 };

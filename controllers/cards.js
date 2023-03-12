@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const {
   STATUS_OK,
   STATUS_OK_CREATED,
@@ -5,6 +6,7 @@ const {
 
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 const WrongCardOwnerError = require('../errors/WrongCardOwnerError');
 
 // GET /cards
@@ -19,7 +21,19 @@ module.exports.createCard = (req, res, next) => {
 
   return Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(STATUS_OK_CREATED).send({ data: card }))
-    .catch(next);
+    .catch((err) => {
+      // прошлый способ мне нравился больше, когда я использовал:
+      // if (err instanceof mongoose.Error.ValidationError)
+      // в централизованном обработчике ошибок.
+      // А так получается приходится дублировать код в нескольких местах для валидации монги.
+      if (err instanceof mongoose.Error.ValidationError) {
+        const validationError = new BadRequestError();
+        validationError.message = err.message;
+        next(validationError);
+      } else {
+        next(err);
+      }
+    });
 };
 
 // DELETE /cards/:cardId

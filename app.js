@@ -2,6 +2,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 
 const celebrate = require('celebrate');
 
@@ -24,6 +25,7 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({ origin: ['http://localhost:3000'] }));
+app.use(cookieParser());
 app.use(express.json());
 
 app.post('/signin', validateSignInData, login);
