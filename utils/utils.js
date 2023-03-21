@@ -1,7 +1,7 @@
 const ApplicationError = require('../errors/ApplicationError');
 
 module.exports.appErrorHandler = (err, req, res, next) => {
-  // в теории советуют работать именно с инстансами классов
+  // в теории советуют работать именно с инстансами классов,
   // а не c именами ошибок
 
   // ApplicationError(500) ошибка по умолчанию и её наследники
