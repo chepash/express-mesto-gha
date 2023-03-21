@@ -49,7 +49,7 @@ module.exports.createUser = (req, res, next) => {
       if (err.code === 11000) {
         const conflictErr = new DuplicateKeyError();
         next(conflictErr);
-      } if (err instanceof mongoose.Error.ValidationError) {
+      } else if (err instanceof mongoose.Error.ValidationError) {
         // прошлый способ мне нравился больше, когда я использовал:
         // if (err instanceof mongoose.Error.ValidationError)
         // в централизованном обработчике ошибок.
