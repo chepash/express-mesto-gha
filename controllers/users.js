@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 const DuplicateKeyError = require('../errors/DuplicateKeyError');
 
 const { STATUS_OK, STATUS_OK_CREATED } = require('../utils/constants');
@@ -45,6 +47,14 @@ module.exports.createUser = (req, res, next) => {
       if (err.code === 11000) {
         const conflictErr = new DuplicateKeyError();
         next(conflictErr);
+      } else if (err instanceof mongoose.Error.ValidationError) {
+        // прошлый способ мне нравился больше, когда я использовал:
+        // if (err instanceof mongoose.Error.ValidationError)
+        // в централизованном обработчике ошибок.
+        // А так получается приходится дублировать код в нескольких местах для валидации монги.
+        const validationError = new BadRequestError();
+        validationError.message = err.message;
+        next(validationError);
       } else {
         next(err);
       }
@@ -77,7 +87,19 @@ module.exports.updateUserInfo = (req, res, next) => {
     throw new NotFoundError();
   })
     .then((user) => res.status(STATUS_OK).send(user))
-    .catch(next);
+    .catch((err) => {
+      // прошлый способ мне нравился больше, когда я использовал:
+      // if (err instanceof mongoose.Error.ValidationError)
+      // в централизованном обработчике ошибок.
+      // А так получается приходится дублировать код в нескольких местах для валидации монги.
+      if (err instanceof mongoose.Error.ValidationError) {
+        const validationError = new BadRequestError();
+        validationError.message = err.message;
+        next(validationError);
+      } else {
+        next(err);
+      }
+    });
 };
 
 // PATCH /users/me/avatar
@@ -91,5 +113,17 @@ module.exports.updateUserAvatar = (req, res, next) => {
     throw new NotFoundError();
   })
     .then((user) => res.status(STATUS_OK).send(user))
-    .catch(next);
+    .catch((err) => {
+      // прошлый способ мне нравился больше, когда я использовал:
+      // if (err instanceof mongoose.Error.ValidationError)
+      // в централизованном обработчике ошибок.
+      // А так получается приходится дублировать код в нескольких местах для валидации монги.
+      if (err instanceof mongoose.Error.ValidationError) {
+        const validationError = new BadRequestError();
+        validationError.message = err.message;
+        next(validationError);
+      } else {
+        next(err);
+      }
+    });
 };
