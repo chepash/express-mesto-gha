@@ -11,7 +11,6 @@ const { STATUS_OK, STATUS_OK_CREATED } = require('../utils/constants');
 // GET /users/:id
 module.exports.getUser = (req, res, next) => {
   const { id } = req.params;
-  // const id = req.user._id;
 
   return User.findById(id)
     .orFail(() => {
