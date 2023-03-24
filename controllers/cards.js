@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const {
   STATUS_OK,
   STATUS_OK_CREATED,
@@ -11,8 +12,9 @@ const WrongCardOwnerError = require('../errors/WrongCardOwnerError');
 
 // GET /cards
 module.exports.getCards = (req, res, next) => Card.find({})
+  .sort({ createdAt: -1 })
   .populate(['owner', 'likes'])
-  .then((cards) => res.status(STATUS_OK).send({ data: cards }))
+  .then((cards) => res.status(STATUS_OK).send(cards))
   .catch(next);
 
 // POST /cards
@@ -20,7 +22,11 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(STATUS_OK_CREATED).send({ data: card }))
+    .then((card) => Card.findById(card._id)
+      .populate(['owner', 'likes'])
+      .then((populatedCard) => {
+        res.status(STATUS_OK_CREATED).send(populatedCard);
+      }))
     .catch((err) => {
       // прошлый способ мне нравился больше, когда я использовал:
       // if (err instanceof mongoose.Error.ValidationError)
@@ -51,7 +57,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
       throw new WrongCardOwnerError();
     })
-    .then((cards) => res.status(STATUS_OK).send({ data: cards }))
+    .then((cards) => res.status(STATUS_OK).send(cards))
     .catch(next);
 };
 
@@ -65,7 +71,7 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
     throw new NotFoundError();
   })
   .populate(['owner', 'likes'])
-  .then((card) => res.status(STATUS_OK).send({ data: card }))
+  .then((card) => res.status(STATUS_OK).send(card))
   .catch(next);
 
 // DELETE /cards/:cardId/likes
@@ -78,5 +84,5 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
     throw new NotFoundError();
   })
   .populate(['owner', 'likes'])
-  .then((card) => res.status(STATUS_OK).send({ data: card }))
+  .then((card) => res.status(STATUS_OK).send(card))
   .catch(next);

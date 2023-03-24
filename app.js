@@ -14,6 +14,7 @@ const { createUser } = require('./controllers/users');
 const { login } = require('./controllers/login');
 const { auth } = require('./middlewares/auth');
 const { validateSignInData, validateSignUpData } = require('./utils/validation');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
@@ -27,11 +28,15 @@ app.use(helmet());
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+app.use(requestLogger);
 
 app.post('/signin', validateSignInData, login);
 app.post('/signup', validateSignUpData, createUser);
 
 app.use(auth, routes);
+
+app.use(errorLogger);
+
 app.use(celebrate.errors());
 app.use(appErrorHandler);
 

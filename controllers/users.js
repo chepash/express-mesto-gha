@@ -11,7 +11,6 @@ const { STATUS_OK, STATUS_OK_CREATED } = require('../utils/constants');
 // GET /users/:id
 module.exports.getUser = (req, res, next) => {
   const { id } = req.params;
-  // const id = req.user._id;
 
   return User.findById(id)
     .orFail(() => {
@@ -26,7 +25,7 @@ module.exports.getUser = (req, res, next) => {
 
 // GET /users
 module.exports.getUsers = (req, res, next) => User.find({})
-  .then((users) => res.status(STATUS_OK).send({ data: users }))
+  .then((users) => res.status(STATUS_OK).send(users))
   .catch(next);
 
 // POST /signup
@@ -36,20 +35,18 @@ module.exports.createUser = (req, res, next) => {
     ...req.body, password: hash,
   })
     .then((user) => res.status(STATUS_OK_CREATED).send({
-      data:
-      { // высылаем в ответ всё кроме хэша пароля
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
-      },
+      // высылаем в ответ всё кроме хэша пароля
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
     }))
     .catch((err) => {
       if (err.code === 11000) {
         const conflictErr = new DuplicateKeyError();
         next(conflictErr);
-      } if (err instanceof mongoose.Error.ValidationError) {
+      } else if (err instanceof mongoose.Error.ValidationError) {
         // прошлый способ мне нравился больше, когда я использовал:
         // if (err instanceof mongoose.Error.ValidationError)
         // в централизованном обработчике ошибок.
@@ -88,7 +85,7 @@ module.exports.updateUserInfo = (req, res, next) => {
   }).orFail(() => {
     throw new NotFoundError();
   })
-    .then((user) => res.status(STATUS_OK).send({ data: user }))
+    .then((user) => res.status(STATUS_OK).send(user))
     .catch((err) => {
       // прошлый способ мне нравился больше, когда я использовал:
       // if (err instanceof mongoose.Error.ValidationError)
@@ -114,7 +111,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
   }).orFail(() => {
     throw new NotFoundError();
   })
-    .then((user) => res.status(STATUS_OK).send({ data: user }))
+    .then((user) => res.status(STATUS_OK).send(user))
     .catch((err) => {
       // прошлый способ мне нравился больше, когда я использовал:
       // if (err instanceof mongoose.Error.ValidationError)
