@@ -26,6 +26,8 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', jwt, {
         maxAge: 3600000 * 24 * 7, // expiresIn: '7d'
         httpOnly: true,
+        domain: 'localhost',
+        path: '/',
       }).send({ message: 'Successful authorization' }).end();
     })
     .catch(next);

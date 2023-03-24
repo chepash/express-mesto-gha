@@ -1,9 +1,7 @@
 const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
 
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
-const BadRequestError = require('../errors/BadRequestError');
 const DuplicateKeyError = require('../errors/DuplicateKeyError');
 
 const { STATUS_OK, STATUS_OK_CREATED } = require('../utils/constants');
@@ -26,7 +24,7 @@ module.exports.getUser = (req, res, next) => {
 
 // GET /users
 module.exports.getUsers = (req, res, next) => User.find({})
-  .then((users) => res.status(STATUS_OK).send({ data: users }))
+  .then((users) => res.status(STATUS_OK).send(users))
   .catch(next);
 
 // POST /signup
@@ -36,27 +34,17 @@ module.exports.createUser = (req, res, next) => {
     ...req.body, password: hash,
   })
     .then((user) => res.status(STATUS_OK_CREATED).send({
-      data:
-      { // высылаем в ответ всё кроме хэша пароля
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
-      },
+      // высылаем в ответ всё кроме хэша пароля
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
     }))
     .catch((err) => {
       if (err.code === 11000) {
         const conflictErr = new DuplicateKeyError();
         next(conflictErr);
-      } else if (err instanceof mongoose.Error.ValidationError) {
-        // прошлый способ мне нравился больше, когда я использовал:
-        // if (err instanceof mongoose.Error.ValidationError)
-        // в централизованном обработчике ошибок.
-        // А так получается приходится дублировать код в нескольких местах для валидации монги.
-        const validationError = new BadRequestError();
-        validationError.message = err.message;
-        next(validationError);
       } else {
         next(err);
       }
@@ -88,20 +76,8 @@ module.exports.updateUserInfo = (req, res, next) => {
   }).orFail(() => {
     throw new NotFoundError();
   })
-    .then((user) => res.status(STATUS_OK).send({ data: user }))
-    .catch((err) => {
-      // прошлый способ мне нравился больше, когда я использовал:
-      // if (err instanceof mongoose.Error.ValidationError)
-      // в централизованном обработчике ошибок.
-      // А так получается приходится дублировать код в нескольких местах для валидации монги.
-      if (err instanceof mongoose.Error.ValidationError) {
-        const validationError = new BadRequestError();
-        validationError.message = err.message;
-        next(validationError);
-      } else {
-        next(err);
-      }
-    });
+    .then((user) => res.status(STATUS_OK).send(user))
+    .catch(next);
 };
 
 // PATCH /users/me/avatar
@@ -114,18 +90,6 @@ module.exports.updateUserAvatar = (req, res, next) => {
   }).orFail(() => {
     throw new NotFoundError();
   })
-    .then((user) => res.status(STATUS_OK).send({ data: user }))
-    .catch((err) => {
-      // прошлый способ мне нравился больше, когда я использовал:
-      // if (err instanceof mongoose.Error.ValidationError)
-      // в централизованном обработчике ошибок.
-      // А так получается приходится дублировать код в нескольких местах для валидации монги.
-      if (err instanceof mongoose.Error.ValidationError) {
-        const validationError = new BadRequestError();
-        validationError.message = err.message;
-        next(validationError);
-      } else {
-        next(err);
-      }
-    });
+    .then((user) => res.status(STATUS_OK).send(user))
+    .catch(next);
 };
