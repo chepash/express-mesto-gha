@@ -5,7 +5,12 @@ const { PORT = '3000' } = process.env;
 const { DB_ADDRESS = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const corsOptions = {
-  origin: ['http://localhost:3005', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:3005',
+    'http://localhost:3000',
+    'https://praktikum.tk',
+    'http://praktikum.tk',
+  ],
   credentials: true,
 };
 
